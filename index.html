@@ -3,121 +3,221 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#9bdcff">
+<meta name="theme-color" content="#8bd7ff">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>렁대콩의 모험 ONLINE</title>
-<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.png">
+<title>렁대콩의 모험 ONLINE V2</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.png">
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;touch-action:none;overscroll-behavior:none;font-family:system-ui,-apple-system,sans-serif;background:#9bdcff}
-#app{position:fixed;inset:0;overflow:hidden}canvas{width:100%;height:100%;display:block}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;touch-action:none;overscroll-behavior:none;font-family:system-ui,-apple-system,sans-serif;background:#8bd7ff}
+#app{position:fixed;inset:0;overflow:hidden}
+canvas{width:100%;height:100%;display:block}
 .hud{position:absolute;z-index:5;left:12px;top:calc(10px + env(safe-area-inset-top));font-weight:900;color:#17351e;text-shadow:0 1px #fff}
-#bossHud{position:absolute;z-index:5;top:calc(65px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);width:min(72vw,520px);display:none;text-align:center;font-weight:900;color:#7a1d1d}
-.bar{height:14px;border:3px solid #421;background:#fff;border-radius:10px;overflow:hidden}.fill{height:100%;background:#d83232;width:100%}
+#level{font-size:13px;opacity:.85}
+#bossHud{position:absolute;z-index:5;top:calc(67px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);width:min(75vw,520px);display:none;text-align:center;font-weight:900;color:#7a1d1d}
+.bar{height:14px;border:3px solid #421;background:#fff;border-radius:10px;overflow:hidden}.fill{height:100%;background:#e84b4b;width:100%}
 .tools{position:absolute;z-index:6;right:10px;top:calc(10px + env(safe-area-inset-top));display:flex;gap:7px}
 button,input{font:inherit}.sm{border:0;border-radius:13px;padding:8px 11px;background:#ffffffdf;font-weight:900}
-.overlay{position:absolute;z-index:10;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(#9bdcffee,#fffffff5);padding:18px;overflow:auto}
+.overlay{position:absolute;z-index:10;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(#9bdcffee,#fffffff6);padding:18px;overflow:auto}
 .card{width:min(94vw,620px);text-align:center;color:#17351e}.bean{font-size:64px}.card h1{font-size:clamp(32px,9vw,62px);line-height:.95;margin:5px 0}.sub{font-weight:750}
 .primary{border:0;border-radius:999px;padding:15px 28px;background:#2d9f49;color:#fff;font-size:20px;font-weight:1000;box-shadow:0 6px #1f7333;margin:9px}
-.secondary{border:0;border-radius:999px;padding:11px 18px;background:#fff;color:#24422a;font-weight:900;margin:5px;box-shadow:0 2px 10px #0002}
 .namebox{width:min(310px,86vw);border:3px solid #b6d9bc;border-radius:15px;padding:12px 14px;font-weight:900;text-align:center;outline:none;background:#fff}
 .skinrow{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:12px 0}.skin{width:62px;height:62px;border:3px solid transparent;border-radius:18px;font-size:32px;background:#ffffffc9}.skin.sel{border-color:#2d9f49}
-.rank{margin:12px auto;padding:12px;background:#ffffffb8;border-radius:18px;text-align:left;max-width:430px}.rank h3{margin:0 0 8px;text-align:center}.rank ol{margin:0;padding-left:30px}.rank li{padding:3px 0}.me{font-weight:1000;color:#167436}.note{font-size:12px;opacity:.72;margin-top:8px}
-.status{font-size:13px;font-weight:800;min-height:20px}.tabs{display:flex;justify-content:center;gap:6px}.tab{border:0;border-radius:99px;padding:7px 12px;font-weight:900;background:#ffffff99}.tab.active{background:#2d9f49;color:#fff}
+.rank{margin:12px auto;padding:12px;background:#ffffffbd;border-radius:18px;text-align:left;max-width:430px}.rank h3{margin:0 0 8px;text-align:center}.rank ol{margin:0;padding-left:30px}.rank li{padding:3px 0}.me{font-weight:1000;color:#167436}.note{font-size:12px;opacity:.72;margin-top:8px}.status{font-size:13px;font-weight:800;min-height:20px}
 #toast{position:absolute;z-index:30;left:50%;top:80px;transform:translateX(-50%);padding:9px 14px;border-radius:99px;background:#17351eee;color:#fff;font-weight:800;opacity:0;transition:.2s}#toast.show{opacity:1}
-</style></head>
-<body><div id="app">
+#phase{position:absolute;z-index:4;left:50%;top:22%;transform:translateX(-50%);font-weight:1000;font-size:clamp(18px,5vw,34px);color:#fff;text-shadow:0 3px 8px #0008;opacity:0;transition:.25s;pointer-events:none}
+#phase.show{opacity:1}
+</style>
+</head>
+<body>
+<div id="app">
 <canvas id="game"></canvas>
-<div class="hud"><div id="score">점수 0</div><div id="best">내 최고 0</div><div id="jumps">점프 ●●</div></div>
+<div class="hud">
+  <div id="score">점수 0</div>
+  <div id="best">내 최고 0</div>
+  <div id="level">난이도 Lv.1</div>
+  <div id="jumps">점프 ●●</div>
+</div>
 <div id="bossHud"><div>👹 콩먹보 대왕</div><div class="bar"><div class="fill" id="bossFill"></div></div></div>
 <div class="tools"><button class="sm" id="sound">🎵</button><button class="sm" id="share">공유</button></div>
-<div id="toast"></div>
+<div id="toast"></div><div id="phase"></div>
 <div class="overlay" id="overlay"><div class="card">
-<div class="bean">🫘</div><h1>렁대콩의 모험</h1><h2>ONLINE</h2>
-<p class="sub">2단 점프 · 보스전 · 스킨 · 배경음악 · 🌎 통합랭킹</p>
-<input id="nickname" class="namebox" maxlength="10" placeholder="랭킹에 쓸 닉네임 (2~10자)">
+<div class="bean">🫘</div><h1>렁대콩의 모험</h1><h2>ONLINE V2</h2>
+<p class="sub">100점마다 더 어려워지는 장애물 · 쉬워진 보스 · 화려한 배경 · 팔다리 달린 렁대콩 · 새 BGM</p>
+<input id="nickname" class="namebox" maxlength="10" placeholder="랭킹 닉네임 (2~10자)">
 <div><b>캐릭터 스킨</b></div><div class="skinrow" id="skins"></div>
 <button class="primary" id="start">게임 시작</button>
-<div class="rank">
-  <h3>🌎 실시간 통합 TOP 10</h3>
-  <ol id="onlineRanking"><li>불러오는 중...</li></ol>
-  <div class="status" id="rankStatus"></div>
-</div>
-<p class="note">점수는 게임 오버 시 서버에 자동 등록됩니다. 닉네임별 최고점수만 랭킹에 반영됩니다.</p>
+<div class="rank"><h3>🌎 실시간 통합 TOP 10</h3><ol id="onlineRanking"><li>불러오는 중...</li></ol><div class="status" id="rankStatus"></div></div>
+<p class="note">터치/스페이스 = 점프 · 공중에서 한 번 더 = 2단 점프</p>
 </div></div>
 </div>
 <script>
 (()=>{
 const API='/.netlify/functions/leaderboard';
 const app=document.querySelector('#app'),cv=document.querySelector('#game'),c=cv.getContext('2d'),ov=document.querySelector('#overlay');
-const scoreE=document.querySelector('#score'),bestE=document.querySelector('#best'),jumpE=document.querySelector('#jumps'),bossHud=document.querySelector('#bossHud'),bossFill=document.querySelector('#bossFill');
+const scoreE=document.querySelector('#score'),bestE=document.querySelector('#best'),levelE=document.querySelector('#level'),jumpE=document.querySelector('#jumps');
+const bossHud=document.querySelector('#bossHud'),bossFill=document.querySelector('#bossFill'),phaseE=document.querySelector('#phase');
 const skins=[['green','🫘','#69b96b'],['pink','🌸','#ef82a8'],['gold','👑','#e9b83f'],['ice','❄️','#69c9df'],['ninja','🥷','#565a67']];
-let skin=localStorage.getItem('rdk_skin')||'green',best=+(localStorage.getItem('rdk_best_online')||0),nickname=localStorage.getItem('rdk_nick')||'';
-let W,H,ground,state='menu',score=0,speed=7,last=performance.now(),spawn=70,obs=[],shots=[],boss=null,soundOn=true,audio=null,musicTimer=null,startedAt=0;
-const p={x:100,y:0,w:58,h:72,vy:0,jumps:0};
+let skin=localStorage.getItem('rdk_skin')||'green',best=+(localStorage.getItem('rdk_best_online_v2')||0),nickname=localStorage.getItem('rdk_nick')||'';
+let W,H,ground,state='menu',score=0,last=performance.now(),spawn=75,obs=[],shots=[],boss=null,soundOn=true,audio=null,musicTimer=null,startedAt=0,lastLevel=1;
+const p={x:100,y:0,w:58,h:72,vy:0,jumps:0,run:0};
+
 function col(){return skins.find(x=>x[0]===skin)?.[2]||'#69b96b'}
-function fit(){let d=Math.min(devicePixelRatio||1,2),r=app.getBoundingClientRect();cv.width=r.width*d;cv.height=r.height*d;c.setTransform(d,0,0,d,0,0);W=r.width;H=r.height;ground=H*.82;p.x=Math.max(55,W*.15);p.w=Math.max(48,Math.min(62,W*.065));p.h=p.w*1.22;if(state!=='play')p.y=ground-p.h}
-function tone(f,d=.06,v=.035,type='square'){if(!soundOn)return;try{audio||=new(AudioContext||webkitAudioContext)();let o=audio.createOscillator(),g=audio.createGain();o.frequency.value=f;o.type=type;g.gain.value=v;o.connect(g);g.connect(audio.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,audio.currentTime+d);o.stop(audio.currentTime+d)}catch(e){}}
-function music(){clearInterval(musicTimer);if(!soundOn||state!=='play')return;let seq=[262,330,392,523,392,330],i=0;musicTimer=setInterval(()=>tone(seq[i++%seq.length],.12,.011,'triangle'),230)}
+function fit(){let d=Math.min(devicePixelRatio||1,2),r=app.getBoundingClientRect();cv.width=r.width*d;cv.height=r.height*d;c.setTransform(d,0,0,d,0,0);W=r.width;H=r.height;ground=H*.82;p.x=Math.max(58,W*.15);p.w=Math.max(50,Math.min(64,W*.068));p.h=p.w*1.22;if(state!=='play')p.y=ground-p.h}
+function tone(f,d=.06,v=.03,type='square'){if(!soundOn)return;try{audio||=new(AudioContext||webkitAudioContext)();let o=audio.createOscillator(),g=audio.createGain();o.frequency.value=f;o.type=type;g.gain.value=v;o.connect(g);g.connect(audio.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,audio.currentTime+d);o.stop(audio.currentTime+d)}catch(e){}}
+
+function startMusic(){
+ clearInterval(musicTimer);
+ if(!soundOn||state!=='play')return;
+ try{audio||=new(AudioContext||webkitAudioContext)(); if(audio.state==='suspended')audio.resume()}catch(e){}
+ const melody=[523,659,784,659,587,659,523,392,523,659,880,784,659,587,523,392];
+ const bass=[131,131,147,147,165,165,147,147];
+ let i=0;
+ musicTimer=setInterval(()=>{
+   if(state!=='play'||!soundOn)return;
+   tone(melody[i%melody.length],.13,.012,'triangle');
+   if(i%2===0)tone(bass[Math.floor(i/2)%bass.length],.18,.011,'sine');
+   if(i%4===2)tone(220,.025,.008,'square');
+   i++;
+ },170);
+}
 function toast(m){let t=document.querySelector('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),1500)}
+function flash(m){phaseE.textContent=m;phaseE.classList.add('show');clearTimeout(flash.t);flash.t=setTimeout(()=>phaseE.classList.remove('show'),1200)}
 function renderSkins(){let box=document.querySelector('#skins');box.innerHTML='';skins.forEach(s=>{let b=document.createElement('button');b.className='skin '+(skin===s[0]?'sel':'');b.textContent=s[1];b.onclick=()=>{skin=s[0];localStorage.setItem('rdk_skin',skin);renderSkins();tone(600)};box.appendChild(b)})}
-async function loadRanking(){
- const el=document.querySelector('#onlineRanking'),st=document.querySelector('#rankStatus');
- if(!el)return; st.textContent='랭킹 서버 연결 중...';
- try{
-   const r=await fetch(API+'?t='+Date.now(),{cache:'no-store'}); if(!r.ok)throw Error();
-   const d=await r.json(); el.innerHTML='';
-   (d.leaderboard||[]).slice(0,10).forEach((x,i)=>{let li=document.createElement('li');li.innerHTML=`<b>${escapeHtml(x.name)}</b> — ${x.score}점`;if(x.name===nickname)li.className='me';el.appendChild(li)});
-   if(!d.leaderboard?.length)el.innerHTML='<li>아직 기록이 없습니다. 1등에 도전!</li>';
-   st.textContent='실시간 서버 랭킹';
- }catch(e){el.innerHTML='<li>랭킹 서버 연결 실패</li>';st.textContent='Netlify Functions 배포 여부를 확인하세요.'}
-}
-function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-async function submitScore(s,duration){
- try{
-  let r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:nickname,score:s,duration:Math.round(duration)})});
-  let d=await r.json(); if(!r.ok)throw Error(d.error||'등록 실패'); toast(d.personalBest?'🎉 통합랭킹 신기록!':'점수 등록 완료'); return true;
- }catch(e){toast('랭킹 등록 실패');return false}
-}
+async function loadRanking(){const el=document.querySelector('#onlineRanking'),st=document.querySelector('#rankStatus');if(!el)return;st.textContent='랭킹 서버 연결 중...';try{const r=await fetch(API+'?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error();const d=await r.json();el.innerHTML='';(d.leaderboard||[]).slice(0,10).forEach(x=>{let li=document.createElement('li');li.innerHTML=`<b>${esc(x.name)}</b> — ${x.score}점`;if(x.name===nickname)li.className='me';el.appendChild(li)});if(!d.leaderboard?.length)el.innerHTML='<li>아직 기록이 없습니다.</li>';st.textContent='실시간 서버 랭킹'}catch(e){el.innerHTML='<li>랭킹 서버 연결 실패</li>';st.textContent='Netlify Functions 확인 필요'}}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+async function submitScore(s,duration){try{let r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:nickname,score:s,duration:Math.round(duration)})});let d=await r.json();if(!r.ok)throw Error();toast(d.personalBest?'🎉 통합랭킹 신기록!':'점수 등록 완료')}catch(e){toast('랭킹 등록 실패')}}
 function validName(n){return /^[가-힣A-Za-z0-9_]{2,10}$/.test(n)}
-function reset(){score=0;speed=7;spawn=65;obs=[];shots=[];boss=null;p.y=ground-p.h;p.vy=0;p.jumps=0;bossHud.style.display='none';scoreE.textContent='점수 0';jumpE.textContent='점프 ●●'}
-function start(){
- let inp=document.querySelector('#nickname'); if(inp){nickname=inp.value.trim()}
- if(!validName(nickname)){toast('닉네임은 한글/영문/숫자 2~10자로 입력');return}
- localStorage.setItem('rdk_nick',nickname);reset();state='play';startedAt=Date.now();ov.style.display='none';music()
+function level(){return Math.min(10,Math.floor(score/100)+1)}
+function speed(){return 6.4 + (level()-1)*0.62 + Math.min(2.2,score/800)}
+function reset(){score=0;spawn=80;obs=[];shots=[];boss=null;p.y=ground-p.h;p.vy=0;p.jumps=0;p.run=0;lastLevel=1;bossHud.style.display='none';scoreE.textContent='점수 0';levelE.textContent='난이도 Lv.1';jumpE.textContent='점프 ●●'}
+function start(){let inp=document.querySelector('#nickname');if(inp)nickname=inp.value.trim();if(!validName(nickname)){toast('닉네임은 한글/영문/숫자 2~10자');return}localStorage.setItem('rdk_nick',nickname);reset();state='play';startedAt=Date.now();ov.style.display='none';startMusic();flash('🌈 모험 시작!')}
+function jump(){if(state!=='play'||p.jumps>=2)return;p.vy=p.jumps===0?-15.2:-13.2;p.jumps++;jumpE.textContent='점프 '+('●'.repeat(2-p.jumps)+'○'.repeat(p.jumps));tone(p.jumps===1?620:820)}
+
+function addObstacle(){
+ const lv=level(); let type='stump';
+ const r=Math.random();
+ if(lv<=1) type='stump';
+ else if(lv===2) type=r<.7?'stump':'spike';
+ else if(lv===3) type=r<.45?'stump':r<.78?'spike':'tall';
+ else if(lv===4) type=r<.35?'stump':r<.62?'spike':r<.84?'tall':'double';
+ else if(lv===5) type=r<.25?'spike':r<.5?'tall':r<.76?'double':'orb';
+ else type=r<.18?'stump':r<.38?'spike':r<.58?'tall':r<.78?'double':'orb';
+ let o={type,x:W+40};
+ if(type==='stump')Object.assign(o,{y:ground-50,w:46,h:50});
+ if(type==='spike')Object.assign(o,{y:ground-32,w:52,h:32});
+ if(type==='tall')Object.assign(o,{y:ground-92,w:38,h:92});
+ if(type==='double')Object.assign(o,{y:ground-58,w:86,h:58});
+ if(type==='orb')Object.assign(o,{y:ground-105-Math.random()*35,w:34,h:34,phase:Math.random()*6.28});
+ obs.push(o);
+ spawn=Math.max(48,82-lv*3)+Math.random()*Math.max(30,65-lv*2);
 }
-function jump(){if(state!=='play'||p.jumps>=2)return;p.vy=p.jumps===0?-16:-14;p.jumps++;jumpE.textContent='점프 '+('●'.repeat(2-p.jumps)+'○'.repeat(p.jumps));tone(p.jumps===1?620:820)}
-function addObs(){let h=45+Math.random()*50,w=35+Math.random()*30;obs.push({x:W+30,y:ground-h,w,h});spawn=65+Math.random()*65-Math.min(25,speed)}
-function summonBoss(){boss={x:W-120,y:ground-150,w:95,h:150,t:0,shot:70};bossHud.style.display='block';tone(120,.5,.05,'sawtooth')}
-function hit(a,b,pad=.14){return a.x+a.w*pad<b.x+b.w&&a.x+a.w*(1-pad)>b.x&&a.y+a.h*pad<b.y+b.h&&a.y+a.h*(1-pad)>b.y}
-async function over(){
- state='over';clearInterval(musicTimer);tone(120,.3,.05,'sawtooth');let s=Math.floor(score),dur=(Date.now()-startedAt)/1000;
- if(s>best){best=s;localStorage.setItem('rdk_best_online',best)}bestE.textContent='내 최고 '+best;
- await submitScore(s,dur);
- ov.innerHTML=`<div class="card"><div class="bean">💥</div><h1>게임 오버</h1><p class="sub">${escapeHtml(nickname)} · ${s}점 · 내 최고 ${best}점</p>
- <button class="primary" id="again">다시 도전</button><button class="secondary" id="home">메뉴/랭킹</button>
- <div class="rank"><h3>🌎 실시간 통합 TOP 10</h3><ol id="onlineRanking"><li>불러오는 중...</li></ol><div class="status" id="rankStatus"></div></div></div>`;
- ov.style.display='flex';document.querySelector('#again').onclick=start;document.querySelector('#home').onclick=()=>location.reload();loadRanking()
+function summonBoss(){boss={x:W-125,y:ground-145,w:95,h:145,t:0,shot:95,duration:0};shots=[];bossHud.style.display='block';flash('👹 보스 등장!');tone(130,.35,.045,'sawtooth')}
+function hit(a,b,pad=.15){return a.x+a.w*pad<b.x+b.w&&a.x+a.w*(1-pad)>b.x&&a.y+a.h*pad<b.y+b.h&&a.y+a.h*(1-pad)>b.y}
+async function over(){state='over';clearInterval(musicTimer);tone(120,.3,.05,'sawtooth');let s=Math.floor(score),dur=(Date.now()-startedAt)/1000;if(s>best){best=s;localStorage.setItem('rdk_best_online_v2',best)}bestE.textContent='내 최고 '+best;await submitScore(s,dur);ov.innerHTML=`<div class="card"><div class="bean">💥</div><h1>게임 오버</h1><p class="sub">${esc(nickname)} · ${s}점 · 내 최고 ${best}점</p><button class="primary" id="again">다시 도전</button><div class="rank"><h3>🌎 실시간 통합 TOP 10</h3><ol id="onlineRanking"><li>불러오는 중...</li></ol><div class="status" id="rankStatus"></div></div></div>`;ov.style.display='flex';document.querySelector('#again').onclick=start;loadRanking()}
+
+function update(dt){
+ if(state!=='play')return;
+ let q=dt/16.667,lv=level(),sp=speed(); score+=.125*q; p.run+=q;
+ if(lv!==lastLevel){lastLevel=lv;flash(`⚡ 난이도 Lv.${lv}`);tone(880,.12,.03,'triangle')}
+ scoreE.textContent='점수 '+Math.floor(score);levelE.textContent='난이도 Lv.'+lv;
+ p.vy+=.86*q;p.y+=p.vy*q;if(p.y+p.h>=ground){p.y=ground-p.h;p.vy=0;p.jumps=0;jumpE.textContent='점프 ●●'}
+ // boss every 400 pts, but never at start
+ if(!boss && Math.floor(score)>=400 && Math.floor(score)%400<1 && obs.length<2)summonBoss();
+ if(!boss){spawn-=q;if(spawn<=0)addObstacle()}
+ for(let o of obs){o.x-=sp*q;if(o.type==='orb')o.y+=Math.sin((p.run+o.phase)*.06)*.35}
+ obs=obs.filter(o=>o.x+o.w>0);for(let o of obs)if(hit(p,o,o.type==='spike'?.22:.15))return over();
+
+ if(boss){
+   boss.t+=q;boss.duration+=q;boss.y=ground-boss.h-Math.sin(boss.t*.025)*16;boss.shot-=q;
+   // easier boss: slower, fewer projectiles, clear warning
+   if(boss.shot<=0 && shots.length<2){
+      let sy=ground-(50+Math.random()*75);
+      shots.push({x:boss.x+10,y:sy,w:28,h:28,v:5.2+lv*.08,life:0});
+      boss.shot=100+Math.random()*55;
+      tone(180,.07,.02,'sawtooth')
+   }
+   for(let s of shots){s.x-=s.v*q;s.life+=q}
+   shots=shots.filter(s=>s.x+s.w>0);
+   for(let s of shots)if(hit(p,s,.25))return over();
+   const remaining=Math.max(0,1-boss.duration/300);bossFill.style.width=(remaining*100)+'%';
+   if(boss.duration>300){boss=null;shots=[];bossHud.style.display='none';score+=75;flash('🎉 보스 클리어 +75');tone(900,.22,.04,'triangle')}
+ }
 }
-function update(dt){if(state!=='play')return;let q=dt/16.667;score+=.13*q;speed=Math.min(15,7+score/140);scoreE.textContent='점수 '+Math.floor(score);
-p.vy+=.9*q;p.y+=p.vy*q;if(p.y+p.h>=ground){p.y=ground-p.h;p.vy=0;p.jumps=0;jumpE.textContent='점프 ●●'}
-if(!boss&&Math.floor(score)>0&&Math.floor(score)%250<1&&obs.length<2)summonBoss();
-if(!boss){spawn-=q;if(spawn<=0)addObs()}for(let o of obs)o.x-=speed*q;obs=obs.filter(o=>o.x+o.w>0);for(let o of obs)if(hit(p,o))return over();
-if(boss){boss.t+=q;boss.y=ground-boss.h-Math.sin(boss.t*.04)*25;boss.shot-=q;if(boss.shot<=0){shots.push({x:boss.x,y:boss.y+65,w:30,h:30,v:8+speed*.25});boss.shot=55+Math.random()*40;tone(180,.08,.025,'sawtooth')}
-for(let s of shots)s.x-=s.v*q;shots=shots.filter(s=>s.x+s.w>0);for(let s of shots)if(hit(p,s,.2))return over();
-if(boss.t>420){boss=null;shots=[];bossHud.style.display='none';score+=100;tone(900,.2,.04,'triangle')}}
+
+function drawBean(x,y,w,h){
+ c.save();c.translate(x+w/2,y+h/2);
+ const bob=Math.sin(p.run*.22)*2;
+ c.translate(0,bob);
+ // legs
+ c.strokeStyle='#2f5e38';c.lineWidth=5;c.lineCap='round';
+ c.beginPath();
+ c.moveTo(-w*.17,h*.33);c.lineTo(-w*.28,h*.55);
+ c.moveTo(w*.16,h*.34);c.lineTo(w*.30,h*.55);c.stroke();
+ // shoes
+ c.strokeStyle='#19391f';c.lineWidth=6;c.beginPath();
+ c.moveTo(-w*.34,h*.56);c.lineTo(-w*.22,h*.56);
+ c.moveTo(w*.24,h*.56);c.lineTo(w*.38,h*.56);c.stroke();
+ // arms
+ let arm=Math.sin(p.run*.26)*w*.08;
+ c.strokeStyle='#2f5e38';c.lineWidth=5;c.beginPath();
+ c.moveTo(-w*.31,-h*.05);c.lineTo(-w*.48,h*.08+arm);
+ c.moveTo(w*.31,-h*.03);c.lineTo(w*.48,h*.06-arm);c.stroke();
+ // body
+ c.fillStyle=col();c.strokeStyle='#2f5e38';c.lineWidth=4;c.beginPath();
+ c.moveTo(-w*.28,-h*.38);c.bezierCurveTo(-w*.55,-h*.15,-w*.45,h*.35,-w*.05,h*.44);
+ c.bezierCurveTo(w*.35,h*.52,w*.52,h*.08,w*.33,-h*.3);
+ c.bezierCurveTo(w*.18,-h*.52,-w*.1,-h*.52,-w*.28,-h*.38);c.closePath();c.fill();c.stroke();
+ // face
+ c.fillStyle='#17291a';c.beginPath();c.arc(-w*.1,-h*.07,3.8,0,7);c.arc(w*.16,-h*.07,3.8,0,7);c.fill();
+ c.strokeStyle='#17291a';c.lineWidth=3;c.beginPath();c.arc(w*.03,h*.07,w*.12,.15*Math.PI,.85*Math.PI);c.stroke();
+ if(skin==='gold'){c.font=`${w*.55}px serif`;c.fillText('👑',-w*.28,-h*.39)}
+ if(skin==='ninja'){c.fillStyle='#222';c.fillRect(-w*.35,-h*.18,w*.75,h*.18)}
+ c.restore()
 }
-function bean(x,y,w,h){c.save();c.translate(x+w/2,y+h/2);c.fillStyle=col();c.strokeStyle='#2f5e38';c.lineWidth=4;c.beginPath();c.moveTo(-w*.28,-h*.38);c.bezierCurveTo(-w*.55,-h*.15,-w*.45,h*.35,-w*.05,h*.44);c.bezierCurveTo(w*.35,h*.52,w*.52,h*.08,w*.33,-h*.3);c.bezierCurveTo(w*.18,-h*.52,-w*.1,-h*.52,-w*.28,-h*.38);c.closePath();c.fill();c.stroke();c.fillStyle='#17291a';c.beginPath();c.arc(-w*.1,-h*.07,3.5,0,7);c.arc(w*.16,-h*.07,3.5,0,7);c.fill();c.strokeStyle='#17291a';c.lineWidth=3;c.beginPath();c.arc(w*.03,h*.07,w*.12,.15*Math.PI,.85*Math.PI);c.stroke();if(skin==='gold'){c.font=`${w*.55}px serif`;c.fillText('👑',-w*.28,-h*.38)}if(skin==='ninja'){c.fillStyle='#222';c.fillRect(-w*.35,-h*.18,w*.75,h*.18)}c.restore()}
-function draw(){let g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'#8bd7ff');g.addColorStop(.7,'#eefaff');g.addColorStop(.71,'#a8df83');g.addColorStop(1,'#5da44b');c.fillStyle=g;c.fillRect(0,0,W,H);c.fillStyle='#ffd34d';c.beginPath();c.arc(W*.84,H*.13,35,0,7);c.fill();c.fillStyle='#5a9d47';c.fillRect(0,ground,W,H-ground);
-for(let o of obs){c.fillStyle='#795548';c.strokeStyle='#4e342e';c.lineWidth=4;c.fillRect(o.x,o.y,o.w,o.h);c.strokeRect(o.x,o.y,o.w,o.h)}
-for(let s of shots){c.fillStyle='#ff5722';c.beginPath();c.arc(s.x+s.w/2,s.y+s.h/2,s.w/2,0,7);c.fill();c.fillStyle='#ffd54f';c.beginPath();c.arc(s.x+s.w/2,s.y+s.h/2,s.w/4,0,7);c.fill()}
-if(boss){c.font=`${boss.w*.75}px serif`;c.fillText('👹',boss.x,boss.y+boss.h*.65);c.fillStyle='#54231f';c.fillRect(boss.x+15,boss.y+boss.h*.62,65,boss.h*.38)}
-c.fillStyle='#0002';c.beginPath();c.ellipse(p.x+p.w/2,ground+5,p.w*.45,7,0,0,7);c.fill();bean(p.x,p.y,p.w,p.h)}
+
+function bg(){
+ const lv=level(),t=p.run;
+ // sky gradients shift by level
+ const palettes=[
+  ['#79d8ff','#e9fbff'],['#8fd3ff','#f9e7ff'],['#ffb6d9','#ffe8b8'],['#8fc9ff','#d7c8ff'],['#71d5d2','#e9fff1']
+ ];
+ const pal=palettes[(lv-1)%palettes.length],g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,pal[0]);g.addColorStop(.72,pal[1]);g.addColorStop(.73,'#b9e98f');g.addColorStop(1,'#62ad4f');c.fillStyle=g;c.fillRect(0,0,W,H);
+ // sun/moon
+ c.fillStyle=lv%4===0?'#fff4c2':'#ffd45b';c.beginPath();c.arc(W*.84,H*.13,34,0,7);c.fill();
+ // sparkles
+ for(let i=0;i<18;i++){let x=(i*97-t*.45)%(W+100);if(x<0)x+=W+100;let y=50+(i*53)%(H*.45);c.globalAlpha=.25+.25*Math.sin(t*.03+i);c.fillStyle='#fff';c.beginPath();c.arc(x,y,2+(i%3),0,7);c.fill()}c.globalAlpha=1;
+ // distant mountains
+ c.fillStyle='rgba(88,130,160,.22)';c.beginPath();c.moveTo(0,ground);for(let x=0;x<=W;x+=80){let y=ground-110-Math.sin((x+t*.08)*.015)*35;c.lineTo(x,y)}c.lineTo(W,ground);c.closePath();c.fill();
+ // rolling hills
+ c.fillStyle='rgba(79,164,89,.36)';c.beginPath();c.moveTo(0,ground);for(let x=0;x<=W;x+=60){let y=ground-58-Math.sin((x+t*.16)*.018)*28;c.lineTo(x,y)}c.lineTo(W,ground);c.closePath();c.fill();
+ // trees & flowers parallax
+ for(let i=0;i<10;i++){let x=(i*130-t*1.2)%(W+160);if(x< -60)x+=W+160;let y=ground-20;c.fillStyle='#6a3f25';c.fillRect(x,y-62,10,62);c.fillStyle=i%2?'#3d9b4f':'#4eb85d';c.beginPath();c.arc(x+5,y-70,28,0,7);c.arc(x-12,y-54,20,0,7);c.arc(x+23,y-52,20,0,7);c.fill()}
+ c.fillStyle='#4d9b41';c.fillRect(0,ground,W,H-ground);
+ for(let i=0;i<16;i++){let x=(i*70-t*2.2)%(W+80);if(x<0)x+=W+80;c.fillStyle=i%3===0?'#ffeb3b':i%3===1?'#ff7eb6':'#fff';c.beginPath();c.arc(x,ground+28+(i%2)*20,4,0,7);c.fill()}
+}
+
+function drawObstacle(o){
+ if(o.type==='stump'){c.fillStyle='#7b4d2a';c.strokeStyle='#4f311b';c.lineWidth=4;c.fillRect(o.x,o.y,o.w,o.h);c.strokeRect(o.x,o.y,o.w,o.h);c.fillStyle='#a86c3d';c.beginPath();c.ellipse(o.x+o.w/2,o.y+4,o.w*.42,7,0,0,7);c.fill()}
+ else if(o.type==='spike'){c.fillStyle='#8b8f9a';c.strokeStyle='#4e515b';c.lineWidth=3;c.beginPath();for(let i=0;i<3;i++){let sx=o.x+i*o.w/3;c.moveTo(sx,o.y+o.h);c.lineTo(sx+o.w/6,o.y);c.lineTo(sx+o.w/3,o.y+o.h)}c.fill();c.stroke()}
+ else if(o.type==='tall'){c.fillStyle='#7f6ba8';c.strokeStyle='#4f3e72';c.lineWidth=4;c.fillRect(o.x,o.y,o.w,o.h);c.strokeRect(o.x,o.y,o.w,o.h);for(let y=o.y+12;y<o.y+o.h;y+=18){c.fillStyle='#b9a7e8';c.fillRect(o.x+7,y,o.w-14,6)}}
+ else if(o.type==='double'){c.fillStyle='#c78a45';c.strokeStyle='#7b532a';c.lineWidth=4;c.fillRect(o.x,o.y,o.w*.46,o.h);c.fillRect(o.x+o.w*.54,o.y,o.w*.46,o.h);c.strokeRect(o.x,o.y,o.w*.46,o.h);c.strokeRect(o.x+o.w*.54,o.y,o.w*.46,o.h)}
+ else if(o.type==='orb'){let gr=c.createRadialGradient(o.x+17,o.y+17,3,o.x+17,o.y+17,17);gr.addColorStop(0,'#fff');gr.addColorStop(.4,'#ffe25a');gr.addColorStop(1,'#ff6b3d');c.fillStyle=gr;c.beginPath();c.arc(o.x+17,o.y+17,17,0,7);c.fill()}
+}
+function draw(){
+ bg();for(let o of obs)drawObstacle(o);
+ for(let s of shots){c.fillStyle='#ff6a3d';c.beginPath();c.arc(s.x+s.w/2,s.y+s.h/2,s.w/2,0,7);c.fill();c.fillStyle='#ffd75d';c.beginPath();c.arc(s.x+s.w/2,s.y+s.h/2,s.w/4,0,7);c.fill()}
+ if(boss){c.font=`${boss.w*.75}px serif`;c.fillText('👹',boss.x,boss.y+boss.h*.63);c.fillStyle='#5c2a25';c.fillRect(boss.x+16,boss.y+boss.h*.62,64,boss.h*.38)}
+ c.fillStyle='#0002';c.beginPath();c.ellipse(p.x+p.w/2,ground+5,p.w*.46,8,0,0,7);c.fill();drawBean(p.x,p.y,p.w,p.h)
+}
 function loop(n){let dt=Math.min(34,n-last);last=n;update(dt);draw();requestAnimationFrame(loop)}
 document.querySelector('#nickname').value=nickname;document.querySelector('#start').onclick=start;
 app.addEventListener('pointerdown',e=>{if(!e.target.closest('button,input')&&state==='play')jump()});
 addEventListener('keydown',e=>{if(['Space','ArrowUp','KeyW'].includes(e.code)){e.preventDefault();state==='play'?jump():start()}});
-document.querySelector('#sound').onclick=()=>{soundOn=!soundOn;document.querySelector('#sound').textContent=soundOn?'🎵':'🔇';music()};
-document.querySelector('#share').onclick=async()=>{try{if(navigator.share)await navigator.share({title:'렁대콩의 모험 ONLINE',text:'내 기록을 깨봐! 🫘',url:location.href});else{await navigator.clipboard.writeText(location.href);toast('주소 복사됨!')}}catch(e){}};
+document.querySelector('#sound').onclick=()=>{soundOn=!soundOn;document.querySelector('#sound').textContent=soundOn?'🎵':'🔇';soundOn?startMusic():clearInterval(musicTimer)};
+document.querySelector('#share').onclick=async()=>{try{if(navigator.share)await navigator.share({title:'렁대콩의 모험 ONLINE V2',text:'내 기록을 깨봐! 🫘',url:location.href});else{await navigator.clipboard.writeText(location.href);toast('주소 복사됨!')}}catch(e){}};
 bestE.textContent='내 최고 '+best;renderSkins();loadRanking();fit();addEventListener('resize',fit);requestAnimationFrame(loop)
 })();
-</script></body></html>
+</script>
+</body></html>
