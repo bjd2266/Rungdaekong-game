@@ -1,0 +1,8 @@
+{
+  "name": "렁대콩의 모험 ONLINE",
+  "short_name": "렁대콩",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#9bdcff",
+  "theme_color": "#9bdcff"
+}
